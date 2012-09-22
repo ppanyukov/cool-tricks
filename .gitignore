@@ -14,3 +14,6 @@ _ReSharper.*
 
 # Nuget packages directory
 packages/
+
+# Vi swp files
+*.swp
