@@ -37,9 +37,15 @@
 // on the fact that inner classe have access to private members of outer classes.
 // 
 // Another problem solved!
+//
+// Oh, and if it's really undesirable to include the tests
+// in some releases, use preprocessor
 namespace SelfTestingAssembly
 {
+// Use preprocessor to exlude tests it this is really required
+#if !NO_TESTS
     using NUnit.Framework;
+#endif
 
     /// <summary>
     /// Our class which we want to test.
@@ -62,6 +68,8 @@ namespace SelfTestingAssembly
             return x / y;
         }
 
+        // Use preprocessor to exlude tests in some builds if required
+#if !NO_TESTS
         /// <summary>
         /// Here is the trick:
         /// 
@@ -105,5 +113,6 @@ namespace SelfTestingAssembly
                 }
             }
         }
+#endif // NO_TEST
     }
 }
