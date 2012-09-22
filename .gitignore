@@ -4,3 +4,13 @@ obj
 
 # mstest test results
 TestResults
+
+# ReSharper directory
+_ReSharper.*
+
+# Visual Studio things
+*.suo
+*.user
+
+# Nuget packages directory
+packages/
