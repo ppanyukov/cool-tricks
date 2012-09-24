@@ -15,9 +15,10 @@ namespace GetRidOfNulls
     /// <summary>
     /// Non-generic convenience wrapper to create instances by inferring
     /// the type from the type of the argument.
-    /// 
-    /// Partial for tests.
     /// </summary>
+    /// <remarks>
+    /// The type is partial for test and extensibility purposes.
+    /// </remarks>
     public static partial class NeverNull
     {
         /// <summary>
@@ -42,12 +43,46 @@ namespace GetRidOfNulls
     /// Checks the argument at creation time. If constructor succeeded,
     /// this instance can be used as variables, arguments and return values
     /// with the guarantee that the encapsulated value is not null.
+    /// 
+    /// DO NOT CALL CONSTRUCTORS ON THIS TYPE DIRECTLY. Use implicit
+    /// conversion operators and non-generic <see cref="NeverNull"/>
+    /// instead.
+    /// 
     /// </summary>
-    public sealed class NeverNull<T>
+    /// <remarks>
+    /// OK, this does not guarantee that the encapsulated value is never
+    /// going to be null, because this is a struct and it's always possible
+    /// to call the default constructor on it, and it will intialise the 
+    /// encapsulated value to its default (which is null for reference types).
+    /// 
+    /// One solution would be to make it a class, but then it would become a
+    /// reference type and it would be possible to use nulls where this type
+    /// is expected (thus just shifting the problem of nulls).
+    /// 
+    /// This type tries to solve two problems: 1) of documenting parameters and return
+    /// types without documentation; and 2) reducing the number of NullReferenceException
+    /// to a minimum.
+    /// 
+    /// Looking at the class vs. struct issue, the struct approach will probably work
+    /// better: the values of the NeverNull type will never be null themselves, and
+    /// the in majority of the cases the encapsulated value will be non-null too.
+    /// 
+    /// Invoking default constructor or use of arrays (e.g. new NeverNull{string}[10])
+    /// are probably going to be rare in real life, especially that there are
+    /// implicit conversion operators and non-generic NeverNull type to help
+    /// create instances.
+    /// 
+    /// Even if encapsulated value does happen to be null from time to time,
+    /// hopefully it will rare enough for this type to add value, and be easy to 
+    /// trace to where the default constructor was used when it happens.
+    /// </remarks>
+    public struct NeverNull<T>
     {
         private readonly T value;
 
         /// <summary>
+        /// DO NOT CALL DIRECTLY. Use non-generic <see cref="NeverNull"/> instead.
+        /// 
         /// Creates new instance of <see cref="NeverNull{T}"/> encapsulating the
         /// given value. Throws <see cref="ArgumentNullException"/> if a null value 
         /// is provided as the argument.
@@ -67,6 +102,8 @@ namespace GetRidOfNulls
         }
 
         /// <summary>
+        /// DO NOT CALL DIRECTLY. Use non-generic <see cref="NeverNull"/> instead.
+        /// 
         /// Creates new instance of <see cref="NeverNull{T}"/> from another instance
         /// of <see cref="NeverNull{T}"/>. The new instance encapsulates the same value.
         /// </summary>
@@ -82,6 +119,12 @@ namespace GetRidOfNulls
         {
             get
             {
+                if (this.value == null)
+                {
+                    throw new NullReferenceException(
+                        "Oh snap, the promise of NeverNull is broken. " + 
+                        "Did you call default constructor on NeverNull<T>?");
+                }
                 return this.value;
             }
         }
