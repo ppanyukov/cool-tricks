@@ -12,93 +12,17 @@ namespace GetRidOfNulls
 {
     using System;
 
-    using NUnit.Framework;
-
     /// <summary>
     /// Non-generic convenience wrapper to create instances by inferring
     /// the type from the type of the argument.
+    /// 
+    /// Partial for tests.
     /// </summary>
-    public static class NeverNull
+    public static partial class NeverNull
     {
         public static NeverNull<T> Create<T>(T value)
         {
             return new NeverNull<T>(value);
-        }
-
-        private static class SelfTests
-        {
-            [TestFixture]
-            public class Ctor
-            {
-                [Test]
-                public void DoesNotThrowWhenValueNotNull()
-                {
-                    Assert.DoesNotThrow(() => Create("hello"));
-                }
-
-                [Test]
-                public void WorksWithStructs()
-                {
-                    Assert.DoesNotThrow(() => Create(DateTime.Now));
-                }
-
-                [Test]
-                public void ThrowsWhenValueIsNull()
-                {
-                    Assert.Throws<ArgumentNullException>(() => Create<string>(null));
-                }
-
-                [Test]
-                public void ValueIsCorrectlyAssigned()
-                {
-                    string expectedValue = "some random value";
-                    var neverNull = Create(expectedValue);
-                    Assert.That(neverNull.Value, Is.SameAs(expectedValue));
-                }
-            }
-
-            [TestFixture]
-            public class ImplicitOpToNeverNull
-            {
-
-            }
-
-            [TestFixture]
-            public class ImplicitOpToT
-            {
-
-            }
-
-            [TestFixture]
-            public class GetHashCode
-            {
-                [Test]
-                public void DelegtesToEncapsulatedValue()
-                {
-                    var input = "oehdofd";
-                    var expectedValue = input.GetHashCode();
-                    var actualValue = Create(input).GetHashCode();
-                    Assert.That(actualValue, Is.EqualTo(expectedValue));
-                }
-            }
-
-            [TestFixture]
-            public class Equals
-            {
-            }
-
-            [TestFixture]
-            public class ToString
-            {
-                [Test]
-                public void DelegtesToEncapsulatedValue()
-                {
-                    var input = DateTime.Now;
-                    var expectedValue = input.ToString();
-                    var actualValue = Create(input).ToString();
-                    Assert.That(actualValue, Is.EqualTo(expectedValue));
-                }
-            }
         }
     }
 
