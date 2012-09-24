@@ -20,9 +20,20 @@ namespace GetRidOfNulls
     /// </summary>
     public static partial class NeverNull
     {
+        /// <summary>
+        /// Creates new instance of <see cref="NeverNull{T}"/> encapsulating the
+        /// given value. Throws <see cref="ArgumentNullException"/> if a null value 
+        /// is provided as the argument.
+        /// </summary>
+        /// <param name="value">Value to encapsulate. Must not be null.</param>
         public static NeverNull<T> Create<T>(T value)
         {
             return new NeverNull<T>(value);
+        }
+
+        public static NeverNull<T> Create<T>(NeverNull<T> other)
+        {
+            return new NeverNull<T>(other);
         }
     }
 
@@ -37,11 +48,11 @@ namespace GetRidOfNulls
         private readonly T value;
 
         /// <summary>
-        /// Creates new instance of <see cref="NeverNull{T}"/>. Throws
-        /// <see cref="ArgumentNullException"/> if a null value is provided
-        /// as the argument.
+        /// Creates new instance of <see cref="NeverNull{T}"/> encapsulating the
+        /// given value. Throws <see cref="ArgumentNullException"/> if a null value 
+        /// is provided as the argument.
         /// </summary>
-        /// <param name="value">Value to encapsulate.</param>
+        /// <param name="value">Value to encapsulate. Must not be null.</param>
         public NeverNull(T value)
         {
             // This is the only place we need to check for null!
@@ -52,8 +63,16 @@ namespace GetRidOfNulls
                 throw new ArgumentNullException("value", message);
             }
 
-            // Guaranteed to be non-null from here on.
             this.value = value;
+        }
+
+        /// <summary>
+        /// Creates new instance of <see cref="NeverNull{T}"/> from another instance
+        /// of <see cref="NeverNull{T}"/>. The new instance encapsulates the same value.
+        /// </summary>
+        /// <param name="other">An instance of <see cref="NeverNull{T}"/> from which to create new instance.</param>
+        public NeverNull(NeverNull<T> other) : this(other.Value)
+        {
         }
 
         /// <summary>

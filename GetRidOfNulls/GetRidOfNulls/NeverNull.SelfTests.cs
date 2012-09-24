@@ -44,7 +44,8 @@ namespace GetRidOfNulls
                 [Test]
                 public void ThrowsWhenValueIsNull()
                 {
-                    Assert.Throws<ArgumentNullException>(() => Create<string>(null));
+                    string value = null;
+                    Assert.Throws<ArgumentNullException>(() => Create(value));
                 }
 
                 [Test]
@@ -53,6 +54,46 @@ namespace GetRidOfNulls
                     const string expectedValue = "some random value";
                     var neverNull = Create(expectedValue);
                     Assert.That(neverNull.Value, Is.SameAs(expectedValue));
+                }
+
+                [Test]
+                public void GivingNeverNullAsCtorArgWrapsOnlyEncapsulatedValue()
+                {
+                    const string input = "some string";
+
+                    // First wrapper
+                    var neverNullA = Create(input);
+
+                    // Next call should not wrap our neverNullA, it should
+                    // take the value encapsulated by neverNullA, and wrap that
+                    // instead. We don't want these chains of "NeverNull" wrapping
+                    // each other.
+                    var neverNullB = Create(neverNullA);
+
+                    Assert.That(neverNullB.Value, Is.TypeOf<string>() & Is.SameAs(input));
+                }
+
+                [Test]
+                public void GivingNeverNullAsCtorArgWrapsOnlyEncapsulatedValue_EvenWhenWeCastToObject()
+                {
+                    const string input = "some string";
+
+                    // First wrapper
+                    var neverNullA = Create(input);
+
+                    // Now use this neverNullA as object, to try and trick
+                    // constructor to wrap the neverNullA rather than the
+                    // encapsulated value.
+                    object objNeverNullA = neverNullA;
+
+                    // Next call should not wrap our neverNullA, it should
+                    // take the value encapsulated by neverNullA, and wrap that
+                    // instead. Even though we used object.
+                    var neverNullB = Create(objNeverNullA);
+
+                    // This test fails for now. Not even sure behaviour described here
+                    // should be considered to correct and "good practice"?
+                    Assert.That(neverNullB.Value, Is.TypeOf<string>() & Is.SameAs(input));
                 }
             }
 
